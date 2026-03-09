@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Replay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="background-animation"></div>
+    <div class="container glass-panel">
+        <header class="app-header">
+            <h1>Rhythm&Strings Song DB</h1>
+            <p>Because we love listening to ourselves on repeat</p>
+            <p> Raw draft recordings</p>
+        </header>
+
+        <main class="player-container">
+            <div id="track-list" class="track-list">
+                <!-- Tracks will be dynamically injected here -->
+            </div>
+        </main>
+
+        <footer class="player-controls glass-panel">
+            <div class="now-playing">
+                <div class="track-info">
+                    <h3 id="current-track-name"><span id="header-title-text" class="title-text">Select a
+                            recording</span></h3>
+                </div>
+            </div>
+
+            <div class="controls-wrapper">
+                <div class="main-controls">
+                    <button id="prev-btn" class="control-btn" aria-label="Previous">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="19 20 9 12 19 4 19 20"></polygon>
+                            <line x1="5" y1="19" x2="5" y2="5"></line>
+                        </svg>
+                    </button>
+                    <button id="play-pause-btn" class="control-btn play-btn" aria-label="Play/Pause">
+                        <svg id="play-icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                        <svg id="pause-icon" class="hidden" viewBox="0 0 24 24" fill="currentColor"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="6" y="4" width="4" height="16"></rect>
+                            <rect x="14" y="4" width="4" height="16"></rect>
+                        </svg>
+                    </button>
+                    <button id="next-btn" class="control-btn" aria-label="Next">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="5 4 15 12 5 20 5 4"></polygon>
+                            <line x1="19" y1="5" x2="19" y2="19"></line>
+                        </svg>
+                    </button>
+                    <button id="repeat-btn" class="control-btn toggle-btn active" aria-label="Repeat">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="17 1 21 5 17 9"></polyline>
+                            <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                            <polyline points="7 23 3 19 7 15"></polyline>
+                            <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="progress-container">
+                    <span id="time-current">0:00</span>
+                    <div class="progress-bar-wrapper" id="progress-wrapper">
+                        <div class="progress-bar" id="progress-bar"></div>
+                    </div>
+                    <span id="time-total">0:00</span>
+                </div>
+            </div>
+
+            <audio id="audio-element"></audio>
+        </footer>
+    </div>
+
+    <footer class="page-footer">
+        <div class="social-links">
+            <a href="https://www.instagram.com/rhythm.and.strings/?hl=en" target="_blank"
+                aria-label="Rhythm & Strings Instagram">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+            </a>
+            <a href="https://www.instagram.com/aryan.the.guitarist/?hl=en" target="_blank"
+                aria-label="Aryan's Guitar Instagram">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M8 12a4 4 0 1 0 8 0 4 4 0 1 0-8 0" />
+                    <path d="m14 10.5 5.5-5.5a2.12 2.12 0 1 0-3-3L11 7.5" />
+                    <path d="M9 13.5 3.5 19a2.12 2.12 0 1 0 3 3L12 16.5" />
+                </svg>
+            </a>
+        </div>
+        <p class="copyright">Property of Rhythm&Strings | Copyrights reserved 2026</p>
+        <p class="subtext">Made by Aryan</p>
+    </footer>
+
+    <script type="module" src="script.js"></script>
+</body>
+
+</html>
