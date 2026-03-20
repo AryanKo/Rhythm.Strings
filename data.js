@@ -20,5 +20,6 @@ export const tracks = [
     { id: 17, name: "Sanam Re v1", src: "./assets/audio/AUD-20260318-WA0004.m4a", duration: "0:00" },
     { id: 18, name: "Zindagi Ke Safar Me", src: "./assets/audio/AUD-20260318-WA0005.m4a", duration: "0:00" },
     { id: 19, name: "O Jaane Jaa", src: "./assets/audio/AUD-20260318-WA0006.m4a", duration: "0:00" },
-    { id: 20, name: "Sanam Re", src: "./assets/audio/AUD-20260318-WA0007.m4a", duration: "0:00" }
+    { id: 20, name: "Sanam Re v1.1", src: "./assets/audio/AUD-20260318-WA0007.m4a", duration: "0:00" },
+    { id: 21, name: "Malang Sajna", src: "./assets/audio/AUD-20260320-WA0001.mp4", duration: "0:00" }
 ];

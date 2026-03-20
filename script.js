@@ -22,11 +22,21 @@ document.addEventListener('DOMContentLoaded', () => {
     let isPlaying = false;
     let isRepeating = true; // Default to repeat active
 
+    // Queue State
+    let queue = [];
+    let currentQueueIndex = -1;
+
+    const queueContainer = document.getElementById('queue-container');
+    const queueListContainer = document.getElementById('queue-list');
+    const clearQueueBtn = document.getElementById('clear-queue-btn');
+    const loadingIcon = document.getElementById('loading-icon');
+
+    if (clearQueueBtn) clearQueueBtn.addEventListener('click', clearQueue);
+
     // Initialize application
     function init() {
         renderTrackList();
         loadTrack(currentTrackIndex);
-        audioElement.loop = isRepeating;
         updateRepeatState();
     }
 
@@ -46,6 +56,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="track-title"><span class="title-text">${track.name}</span></div>
                     <div class="track-status">Audio Recording</div>
                 </div>
+                <div class="track-actions">
+                    <button class="action-btn play-next-btn" title="Play Next" aria-label="Play Next">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19"></line></svg>
+                    </button>
+                    <button class="action-btn add-queue-btn" title="Add to Queue" aria-label="Add to Queue">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    </button>
+                </div>
                 <div class="equalizer">
                     <div class="equalizer-bar"></div>
                     <div class="equalizer-bar"></div>
@@ -55,14 +73,28 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
 
             trackEl.addEventListener('click', () => {
-                const isCurrentTrack = currentTrackIndex === index;
+                const isCurrentTrack = (currentTrackIndex === index && currentQueueIndex === -1);
                 if (isCurrentTrack) {
                     togglePlayPause();
                 } else {
+                    currentQueueIndex = -1; // Switch to normal playback
                     currentTrackIndex = index;
                     loadTrack(currentTrackIndex);
                     playTrack();
                 }
+            });
+
+            const playNextBtn = trackEl.querySelector('.play-next-btn');
+            const addQueueBtn = trackEl.querySelector('.add-queue-btn');
+
+            playNextBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                playNext(index);
+            });
+
+            addQueueBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                addToQueue(index);
             });
 
             trackListContainer.appendChild(trackEl);
@@ -84,13 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Update active styling in the list
-        document.querySelectorAll('.track-item').forEach((el, i) => {
-            if (i === index) {
-                el.classList.add('playing');
-            } else {
-                el.classList.remove('playing');
-            }
-        });
+        updateActiveListStyles();
 
         // Reset progress visually
         progressBar.style.width = '0%';
@@ -115,41 +141,52 @@ document.addEventListener('DOMContentLoaded', () => {
         if (playPromise !== undefined) {
             playPromise.then(_ => {
                 isPlaying = true;
-                playIcon.classList.add('hidden');
-                pauseIcon.classList.remove('hidden');
-                updateMarquees();
-            }).catch(error => {
-                console.error("Playback failed (likely due to missing file or browser policy):", error);
-                // Revert state if play fails
-                isPlaying = false;
-                playIcon.classList.remove('hidden');
-                pauseIcon.classList.add('hidden');
-                alert(`Could not play ${tracks[currentTrackIndex].name}. Please ensure the file is at ${tracks[currentTrackIndex].src}`);
-            });
+                    playIcon.classList.add('hidden');
+                    pauseIcon.classList.remove('hidden');
+                    loadingIcon.classList.add('hidden');
+                    updateMarquees();
+                }).catch(error => {
+                    console.warn("Playback interrupted or buffering:", error.name);
+                    // Network stalls and interrupts are normal on mobile. Do not throw aggressive alerts.
+                    isPlaying = false;
+                    playIcon.classList.remove('hidden');
+                    pauseIcon.classList.add('hidden');
+                    loadingIcon.classList.add('hidden');
+                    updateMarquees();
+                });
+            }
         }
-    }
-
-    function pauseTrack() {
-        audioElement.pause();
-        isPlaying = false;
-        playIcon.classList.remove('hidden');
-        pauseIcon.classList.add('hidden');
-        updateMarquees();
-    }
+    
+        function pauseTrack() {
+            audioElement.pause();
+            isPlaying = false;
+            playIcon.classList.remove('hidden');
+            pauseIcon.classList.add('hidden');
+            loadingIcon.classList.add('hidden');
+            updateMarquees();
+        }
 
     function nextTrack() {
-        currentTrackIndex++;
-        if (currentTrackIndex > tracks.length - 1) {
-            currentTrackIndex = 0;
+        if (queue.length > 0) {
+            currentQueueIndex++;
+            if (currentQueueIndex >= queue.length) currentQueueIndex = 0;
+            currentTrackIndex = queue[currentQueueIndex];
+        } else {
+            currentTrackIndex++;
+            if (currentTrackIndex > tracks.length - 1) currentTrackIndex = 0;
         }
         loadTrack(currentTrackIndex);
         if (isPlaying) playTrack();
     }
 
     function prevTrack() {
-        currentTrackIndex--;
-        if (currentTrackIndex < 0) {
-            currentTrackIndex = tracks.length - 1;
+        if (queue.length > 0) {
+            currentQueueIndex--;
+            if (currentQueueIndex < 0) currentQueueIndex = queue.length - 1;
+            currentTrackIndex = queue[currentQueueIndex];
+        } else {
+            currentTrackIndex--;
+            if (currentTrackIndex < 0) currentTrackIndex = tracks.length - 1;
         }
         loadTrack(currentTrackIndex);
         if (isPlaying) playTrack();
@@ -157,7 +194,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function toggleRepeat() {
         isRepeating = !isRepeating;
-        audioElement.loop = isRepeating;
         updateRepeatState();
     }
 
@@ -197,6 +233,118 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isNaN(duration)) {
             audioElement.currentTime = (clickX / width) * duration;
         }
+    }
+
+    // Queue Logic Methods
+    function playNext(index) {
+        if (queue.length === 0) {
+            queue.push(index);
+            currentQueueIndex = -1;
+        } else {
+            const insertAt = currentQueueIndex === -1 ? 0 : currentQueueIndex + 1;
+            queue.splice(insertAt, 0, index);
+        }
+        renderQueue();
+    }
+
+    function addToQueue(index) {
+        queue.push(index);
+        renderQueue();
+    }
+
+    function removeFromQueue(qIndex) {
+        queue.splice(qIndex, 1);
+        if (currentQueueIndex === qIndex) {
+            if (queue.length > 0) {
+                if (currentQueueIndex >= queue.length) currentQueueIndex = 0;
+                currentTrackIndex = queue[currentQueueIndex];
+                loadTrack(currentTrackIndex);
+                if (isPlaying) playTrack();
+            } else {
+                currentQueueIndex = -1;
+                // fallback to something or pause? 
+                pauseTrack();
+            }
+        } else if (currentQueueIndex > qIndex) {
+            currentQueueIndex--;
+        }
+        renderQueue();
+    }
+
+    function clearQueue() {
+        queue = [];
+        currentQueueIndex = -1;
+        renderQueue();
+        updateActiveListStyles();
+    }
+
+    function renderQueue() {
+        if (queue.length === 0) {
+            queueContainer.classList.add('hidden');
+            return;
+        }
+        queueContainer.classList.remove('hidden');
+        queueListContainer.innerHTML = '';
+
+        queue.forEach((trackIndex, qIndex) => {
+            const track = tracks[trackIndex];
+            const qEl = document.createElement('div');
+            qEl.className = 'track-item'; 
+
+            qEl.innerHTML = `
+                <div class="track-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                </div>
+                <div class="track-details">
+                    <div class="track-title"><span class="title-text">${track.name}</span></div>
+                    <div class="track-status">${qIndex === currentQueueIndex ? 'Playing from Queue' : 'In Queue'}</div>
+                </div>
+                <div class="track-actions">
+                    <button class="action-btn remove-queue-btn" title="Remove" aria-label="Remove">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+                <div class="equalizer">
+                    <div class="equalizer-bar"></div>
+                    <div class="equalizer-bar"></div>
+                    <div class="equalizer-bar"></div>
+                    <div class="equalizer-bar"></div>
+                </div>
+            `;
+
+            qEl.addEventListener('click', () => {
+                currentQueueIndex = qIndex;
+                currentTrackIndex = queue[currentQueueIndex];
+                loadTrack(currentTrackIndex);
+                if (!isPlaying) playTrack();
+                else updateActiveListStyles();
+            });
+
+            const removeBtn = qEl.querySelector('.remove-queue-btn');
+            removeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                removeFromQueue(qIndex);
+            });
+
+            queueListContainer.appendChild(qEl);
+        });
+
+        updateActiveListStyles();
+        updateMarquees();
+    }
+
+    function updateActiveListStyles() {
+        const mainTrackItems = trackListContainer.querySelectorAll('.track-item');
+        mainTrackItems.forEach((el, i) => {
+            if (i === currentTrackIndex && currentQueueIndex === -1) el.classList.add('playing');
+            else el.classList.remove('playing');
+        });
+        
+        const qTrackItems = queueListContainer.querySelectorAll('.track-item');
+        qTrackItems.forEach((el, index) => {
+            if (index === currentQueueIndex) el.classList.add('playing');
+            else el.classList.remove('playing');
+        });
     }
 
     // Marquee Logic for overflowing text
@@ -246,12 +394,55 @@ document.addEventListener('DOMContentLoaded', () => {
     progressWrapper.addEventListener('click', setProgress);
     window.addEventListener('resize', updateMarquees);
 
+    // Audio Streaming Events
+    audioElement.addEventListener('waiting', () => {
+        if (isPlaying) {
+            playIcon.classList.add('hidden');
+            pauseIcon.classList.add('hidden');
+            loadingIcon.classList.remove('hidden');
+        }
+    });
+
+    audioElement.addEventListener('playing', () => {
+        isPlaying = true;
+        loadingIcon.classList.add('hidden');
+        playIcon.classList.add('hidden');
+        pauseIcon.classList.remove('hidden');
+    });
+
+    audioElement.addEventListener('error', (e) => {
+        const err = audioElement.error;
+        if (err) {
+            console.error("Audio Player Error Code:", err.code);
+            if (err.code === MediaError.MEDIA_ERR_NETWORK) {
+                alert("Network error: Stream lost. Please check your connection.");
+            } else if (err.code === MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED) {
+                alert(`Cannot play this file. It might be missing or unsupported: ${tracks[currentTrackIndex]?.name || 'Unknown'}`);
+            }
+        }
+        isPlaying = false;
+        loadingIcon.classList.add('hidden');
+        playIcon.classList.remove('hidden');
+        pauseIcon.classList.add('hidden');
+    });
+
     // Auto-play next if not repeating (or handle end behavior)
     audioElement.addEventListener('ended', () => {
-        if (!isRepeating) {
-            nextTrack();
+        if (queue.length > 0) {
+            currentQueueIndex++;
+            if (currentQueueIndex >= queue.length) currentQueueIndex = 0; // Loop queue natively
+            currentTrackIndex = queue[currentQueueIndex];
+            loadTrack(currentTrackIndex);
+            playTrack();
+        } else {
+            if (isRepeating) {
+                // Manually loop single track
+                audioElement.currentTime = 0;
+                playTrack();
+            } else {
+                nextTrack();
+            }
         }
-        // If repeating, audioElement.loop = true handles it natively
     });
 
     // Start

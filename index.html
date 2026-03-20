@@ -19,6 +19,20 @@
         </header>
 
         <main class="player-container">
+            <div id="queue-container" class="queue-container hidden">
+                <div class="queue-header">
+                    <h3>Up Next</h3>
+                    <button id="clear-queue-btn" class="text-btn">Clear Queue</button>
+                </div>
+                <div id="queue-list" class="track-list queue-list">
+                    <!-- Queued tracks will be injected here -->
+                </div>
+                <hr class="queue-divider">
+            </div>
+
+            <div class="track-list-header">
+                <h3>All Songs</h3>
+            </div>
             <div id="track-list" class="track-list">
                 <!-- Tracks will be dynamically injected here -->
             </div>
@@ -50,6 +64,9 @@
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="6" y="4" width="4" height="16"></rect>
                             <rect x="14" y="4" width="4" height="16"></rect>
+                        </svg>
+                        <svg id="loading-icon" class="hidden spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
                         </svg>
                     </button>
                     <button id="next-btn" class="control-btn" aria-label="Next">
