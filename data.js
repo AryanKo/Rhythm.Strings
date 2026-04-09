@@ -21,5 +21,7 @@ export const tracks = [
     { id: 18, name: "Zindagi Ke Safar Me", src: "./assets/audio/AUD-20260318-WA0005.m4a", duration: "0:00" },
     { id: 19, name: "O Jaane Jaa", src: "./assets/audio/AUD-20260318-WA0006.m4a", duration: "0:00" },
     { id: 20, name: "Sanam Re v1.1", src: "./assets/audio/AUD-20260318-WA0007.m4a", duration: "0:00" },
-    { id: 21, name: "Malang Sajna", src: "./assets/audio/AUD-20260320-WA0001.mp4", duration: "0:00" }
+    { id: 21, name: "Malang Sajna", src: "./assets/audio/AUD-20260320-WA0001.mp4", duration: "0:00" },
+    { id: 22, name: "Pehla Pehla Pyaar Hai", src: "./assets/audio/AUD-20260320-WA0002.mp4", duration: "0:00" },
+    { id: 23, name: "Phir Se - Dhurandhar", src: "./assets/audio/AUD-20260408-WA0001.mp3", duration: "0:00" }
 ];
