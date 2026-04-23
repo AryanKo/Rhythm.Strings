@@ -24,5 +24,5 @@ export const tracks = [
     { id: 21, name: "Malang Sajna", src: "./assets/audio/AUD-20260320-WA0001.mp4", duration: "0:00" },
     { id: 22, name: "Pehla Pehla Pyaar Hai", src: "./assets/audio/AUD-20260320-WA0002.mp4", duration: "0:00" },
     { id: 23, name: "Phir Se - Dhurandhar", src: "./assets/audio/AUD-20260408-WA0001.mp4", duration: "0:00" },
-    { id: 24, name: "", src: "./assets/audio/AUD-20260409-WA0002.mp4", duration: "0:00" }
+    { id: 24, name: "Teri Meri Kahani", src: "./assets/audio/AUD-20260408-WA0002.mp4", duration: "0:00" }
 ];
