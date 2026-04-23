@@ -18,6 +18,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const timeCurrent = document.getElementById('time-current');
     const timeTotal = document.getElementById('time-total');
 
+    const volumeBtn = document.getElementById('volume-btn');
+    const volumeSlider = document.getElementById('volume-slider');
+    const volumeProgress = document.getElementById('volume-progress');
+    const volumeIconHigh = document.getElementById('volume-icon-high');
+    const volumeIconLow = document.getElementById('volume-icon-low');
+    const volumeIconMute = document.getElementById('volume-icon-mute');
+
     let currentTrackIndex = 0;
     let isPlaying = false;
     let isRepeating = true; // Default to repeat active
@@ -35,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize application
     function init() {
+        initVolume();
         renderTrackList();
         loadTrack(currentTrackIndex);
         updateRepeatState();
@@ -383,11 +391,75 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Volume Logic
+    function initVolume() {
+        const savedVolume = localStorage.getItem('rs_volume');
+        const savedMuted = localStorage.getItem('rs_muted');
+        
+        let vol = savedVolume !== null ? parseFloat(savedVolume) : 1;
+        let isMuted = savedMuted === 'true';
+        
+        audioElement.volume = vol;
+        audioElement.muted = isMuted;
+        volumeSlider.value = vol;
+        updateVolumeUI(vol, isMuted);
+    }
+
+    function updateVolumeUI(vol, isMuted) {
+        // Update slider progress visually
+        volumeProgress.style.width = `${vol * 100}%`;
+        
+        // Hide all icons
+        volumeIconHigh.classList.add('hidden');
+        volumeIconLow.classList.add('hidden');
+        volumeIconMute.classList.add('hidden');
+        
+        // Determine which to show
+        if (isMuted || vol === 0) {
+            volumeIconMute.classList.remove('hidden');
+        } else if (vol < 0.5) {
+            volumeIconLow.classList.remove('hidden');
+        } else {
+            volumeIconHigh.classList.remove('hidden');
+        }
+    }
+
+    function handleVolumeChange(e) {
+        const vol = parseFloat(e.target.value);
+        audioElement.volume = vol;
+        
+        // If slider dragged from 0 and it was muted, unmute
+        if (vol > 0 && audioElement.muted) {
+            audioElement.muted = false;
+            localStorage.setItem('rs_muted', 'false');
+        }
+        
+        // Update UI and save
+        updateVolumeUI(vol, audioElement.muted);
+        localStorage.setItem('rs_volume', vol);
+    }
+
+    function toggleMute() {
+        audioElement.muted = !audioElement.muted;
+        localStorage.setItem('rs_muted', audioElement.muted.toString());
+        
+        // If we un-mute but volume is 0, bump it to 0.5 for UX
+        if (!audioElement.muted && audioElement.volume === 0) {
+            audioElement.volume = 0.5;
+            volumeSlider.value = 0.5;
+            localStorage.setItem('rs_volume', '0.5');
+        }
+        
+        updateVolumeUI(audioElement.volume, audioElement.muted);
+    }
+
     // Event Listeners
     playPauseBtn.addEventListener('click', togglePlayPause);
     prevBtn.addEventListener('click', prevTrack);
     nextBtn.addEventListener('click', nextTrack);
     repeatBtn.addEventListener('click', toggleRepeat);
+    volumeBtn.addEventListener('click', toggleMute);
+    volumeSlider.addEventListener('input', handleVolumeChange);
 
     audioElement.addEventListener('timeupdate', updateProgress);
     audioElement.addEventListener('loadedmetadata', updateProgress);
