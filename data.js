@@ -1,7 +1,7 @@
 // Define the audio recordings
 // Paths should be relative to the index.html file
 export const tracks = [
-    { id: 1, name: "Jis Raah Pe", src: "./assets/audio/AUD-20251110-WA0001.m4a", duration: "0:00" },
+    { id: 1, name: "Dil Sambhal Ja Zara", src: "./assets/audio/AUD-20251110-WA0001.m4a", duration: "0:00" },
     { id: 2, name: "Tera Hone Laga Hoon", src: "./assets/audio/AUD-20251120-WA0008.m4a", duration: "0:00" },
     { id: 3, name: "Pasoori", src: "./assets/audio/AUD-20251122-WA0018.m4a", duration: "0:00" },
     { id: 4, name: "Maand x Jhol x Zara Zara v1", src: "./assets/audio/AUD-20251129-WA0011.m4a", duration: "0:00" },
@@ -17,10 +17,10 @@ export const tracks = [
     { id: 14, name: "Unke Andaaz-e-Karam", src: "./assets/audio/AUD-20260301-WA0001.m4a", duration: "0:00" },
     { id: 15, name: "Teri Deewani", src: "./assets/audio/AUD-20260307-WA0013.m4a", duration: "0:00" },
     { id: 16, name: "Bang Bang", src: "./assets/audio/AUD-20260307-WA0014.m4a", duration: "0:00" },
-    { id: 17, name: "Sanam Re v1", src: "./assets/audio/AUD-20260318-WA0004.m4a", duration: "0:00" },
+    { id: 17, name: "Sanam Re Pt 1", src: "./assets/audio/AUD-20260318-WA0004.m4a", duration: "0:00" },
     { id: 18, name: "Zindagi Ke Safar Me", src: "./assets/audio/AUD-20260318-WA0005.m4a", duration: "0:00" },
     { id: 19, name: "O Jaane Jaa", src: "./assets/audio/AUD-20260318-WA0006.m4a", duration: "0:00" },
-    { id: 20, name: "Sanam Re v1.1", src: "./assets/audio/AUD-20260318-WA0007.m4a", duration: "0:00" },
+    { id: 20, name: "Sanam Re Pt 2", src: "./assets/audio/AUD-20260318-WA0007.m4a", duration: "0:00" },
     { id: 21, name: "Malang Sajna", src: "./assets/audio/AUD-20260320-WA0001.mp4", duration: "0:00" },
     { id: 22, name: "Pehla Pehla Pyaar Hai", src: "./assets/audio/AUD-20260320-WA0002.mp4", duration: "0:00" },
     { id: 23, name: "Phir Se - Dhurandhar", src: "./assets/audio/AUD-20260408-WA0001.mp4", duration: "0:00" },
