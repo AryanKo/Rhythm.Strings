@@ -33,6 +33,51 @@ document.addEventListener('DOMContentLoaded', () => {
     let queue = [];
     let currentQueueIndex = -1;
 
+    // Dynamic Artwork Engine
+    const iconCache = new Map();
+
+    function hashToColor(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const hue = Math.abs(hash) % 360;
+        return `hsl(${hue}, 65%, 55%)`; // Vibrant dynamic color
+    }
+
+    function generateTrackIcon(trackName) {
+        const size = 64;
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        
+        canvas.width = size;
+        canvas.height = size;
+
+        const text = (trackName || "?").trim().charAt(0).toUpperCase();
+        const bg = hashToColor(trackName);
+
+        // Background
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, size, size);
+
+        // Text
+        ctx.fillStyle = "#ffffff";
+        ctx.font = `bold ${size * 0.55}px 'Outfit', sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        // Slightly offset the y coordinate for visual centering
+        ctx.fillText(text, size / 2, (size / 2) + 2);
+
+        return canvas.toDataURL("image/png");
+    }
+
+    function getIcon(trackName) {
+        if (!iconCache.has(trackName)) {
+            iconCache.set(trackName, generateTrackIcon(trackName));
+        }
+        return iconCache.get(trackName);
+    }
+
     const queueContainer = document.getElementById('queue-container');
     const queueListContainer = document.getElementById('queue-list');
     const clearQueueBtn = document.getElementById('clear-queue-btn');
@@ -57,9 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
             trackEl.dataset.index = index;
 
             trackEl.innerHTML = `
-                <div class="track-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                </div>
+                <img class="track-icon" src="${getIcon(track.name)}" alt="${track.name.charAt(0)}">
                 <div class="track-details">
                     <div class="track-title"><span class="title-text">${track.name}</span></div>
                     <div class="track-status">Audio Recording</div>
@@ -300,9 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
             qEl.className = 'track-item'; 
 
             qEl.innerHTML = `
-                <div class="track-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                </div>
+                <img class="track-icon" src="${getIcon(track.name)}" alt="${track.name.charAt(0)}">
                 <div class="track-details">
                     <div class="track-title"><span class="title-text">${track.name}</span></div>
                     <div class="track-status">${qIndex === currentQueueIndex ? 'Playing from Queue' : 'In Queue'}</div>
